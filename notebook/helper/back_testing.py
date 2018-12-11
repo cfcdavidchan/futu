@@ -1,4 +1,6 @@
 import json, random
+from collections import Counter
+
 
 class back_testing():
     def __init__(self, inventory_limit = 1):
@@ -177,6 +179,51 @@ class back_testing():
         summary['Min Book Value @ low'] = min_book_low
         summary['Max Book Value @ close'] = max_book_close
         summary['Min Book Value @ close'] = min_book_close
+        
+        summary['number_of_trade'] = len(self.order_book) * 2
+        
+        
+        summary['per point sumaary'] = dict()
+        
+        point_earn_list = [v['point earn']for k,v in self.order_book.items()]
+        point_counter = Counter(point_earn_list)
+        point_dict = dict(point_counter)
+        
+        total_trade = len(point)
+        ev = 0
+        for key, item in point_dict.items():
+            ev += (key * (item/total_trade))
+        
+        summary['per point sumaary']['Expected Value per trade'] = ev
+        
+        win = [key for key in point_dict.keys() if key >0]
+        loss = [key for key in point_dict.keys() if key <=0]
+
+        win_rate = len(win) / len(point_dict)
+        loss_rate = len(loss) / len(point_dict)
+
+        average_win = sum(win)/len(win)
+        average_loss = sum(loss)/len(loss)
+
+        max_win = max(win)
+        min_win = min(win)
+
+        max_loss = min(loss)
+        min_loss = max(loss)
+
+        summary['per point sumaary']['win rate'] = win_rate
+        summary['per point sumaary']['loss rate'] = loss_rate
+        
+        summary['per point sumaary']['average win point'] = average_win
+        summary['per point sumaary']['average loss point'] = average_loss
+        
+        summary['per point sumaary']['max win'] = max_win
+        summary['per point sumaary']['min win'] = min_win
+        
+        summary['per point sumaary']['max loss'] = max_loss
+        summary['per point sumaary']['min loss'] = min_loss
+        
+        
         
         return summary
         
